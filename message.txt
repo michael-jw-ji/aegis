@@ -1,0 +1,300 @@
+Hi, my name is Michael and this is my
+take on the century AI take-home
+assessment. Starting off, we have npm
+rundev. And now for me, this also helps
+me set up Olama in the back end, which
+is the LLM I'll be using as I am a pro
+student with no money. Um, so it should
+run on local host 5173. And so I have it
+previously open. So it should just give
+it a fresh a refresh.
+And so after that you'll see the main
+dashboard
+uh with knowledge base uh you can upload
+a JSON you can add an entry and you can
+then filter by category with no
+categories at the moment as there's no
+entries. We can start off by uploading
+JSON with the sample knowledge base
+uploaded 50 entries and zero filled. So
+each one has a question a category an
+answer the day created the ID and the
+date modified. You can see on the left
+side there's the total entries um a
+filter. So if I pick a certain filter
+it'll change the number here and the
+total number of categories. Now if I for
+example like to edit um any entry I can
+do this. I can add a smiley face
+and then you can see that created a new
+version. If I would like to revert to
+the previous version I'll just do this
+and then it will then go back to the
+previous version without smiley face.
+And so this could just be good for any
+policy changes or reverting policy
+changes as well. Just ensuring that it
+is the most up-to-date knowledge base.
+You can also delete them if you would
+like but that I will not do it at the
+moment.
+And so moving on to questions. Um same
+thing you could upload the JSON. And so
+I am using SQite in the background as
+for smaller projects like this. I think
+it is much better as it is lightweight
+compared to some of those bigger ones
+like superbase and firebase. So um I
+believe that in this case it is a much
+better choice. And so same thing here
+you have the ID, you have the question
+and you have a category. The category
+was uh determined just by using keywords
+in the system or in the question rather.
+And so and this will just relate to any
+of the knowledge based questions and
+answers and then it will just like see
+if there's any similarities. If there is
+then it'll put it into a certain
+category
+and then you can generate the answers
+and so generating answers.
+Now that I have the entrance generated,
+I'll go a little bit more in depth on
+how the workflow works. So I am using
+lang graph and l chain and mainly l
+graph for two nodes mainly retrieval and
+generation. So starting off with
+retrieval I uh put in an agent state and
+this agent state has question ID the
+question a generated answer uh which is
+to be determined. So an empty string, a
+confidence score um which is to be to be
+determined as well and relevant entries
+which is an empty array. So I will input
+this into the first um quote unquote
+node or state and then I would query all
+uh the KB entries. I would find any
+relevant entries using the term
+frequency uh inverse document frequency.
+And so this will just determine um like
+which kind of words are kind of more
+important and are more relevant to the
+question I want to answer. I will then
+kind of sort them by score choosing the
+top five and then I'll then calculate a
+confidence score. And so this confidence
+score will be be between zero and one.
+And this will just determine how
+confident
+I guess the LM is in like determining
+its relation compared to the question I
+want to answer. And so now I will have
+an array with the five or so entries and
+a confidence score between zero and one.
+And now I would input the new agent
+state into the generation node. And so
+this generation node would then take in
+with these uh fields fields. So like the
+question the question ID the relevant
+entries and the confidence score and so
+this will just extract the sorry this
+will just extract the information check
+the confidence uh threshold I have set
+the threshold to 0.55 and so if it is
+below this 0.55 threshold I will then uh
+get or return no info kind of available
+as there's kind of like not enough
+relevant information to give a good
+answer or if there's no entries in
+general then I'll return the same as
+well. Otherwise, I would continue the
+process and I would build a context
+string. So, this uh format would just be
+the entry or like the relevant entry.
+The relevant entry is category,
+question, answer. And I'll do the same
+with all the relevant entries in the
+array. I would then uh call lang chain.
+And so, calling lang chain, I would
+first want to format the prompt using a
+prompt template. And so this is just to
+get a uniform prompt to put into the
+Lama LLM later on. So just like context,
+question relevant, relevance, the
+confidence score and all these things
+put together into one kind of JSON
+format. And I would want to put this
+into a runnable lambda which will then
+make an HTTP post uh call to lama which
+will then take in that uh JSON formatted
+uh input and output me another uh
+response string. And so that will be my
+answer.
+And so I think uh right now I think lang
+chain and langraph are much better uh to
+use in this case as lang chain uh you
+can easily do like switching and like so
+for example you have one section that
+will do for example uh the prompt
+template you know that's another section
+um calling and so you can like easily
+reorder these and create different
+sequences that you would want and um
+there's also built-in error handling and
+so it's just much better to use and for
+lang graph you could use conditional
+branching although I did not use in this
+case and there's also parallel execution
+which will be shown later and so it's
+kind of like these frameworks are better
+suited for this case and so given these
+responses
+for example for something like the
+question nine what security measures are
+implemented for IoT devices and OT
+systems so because there is no not
+enough relevant information in the
+knowledge case
+uh there will be no really answer and
+because of that the three judges will
+give scores of zero with a warning or a
+fail due to the lack of uh relevant KB
+context. And so I did this because I did
+want to reduce hallucinations as I think
+the main goal here is to not create fake
+information as this is a very kind of
+sensitive topic. If anything is wrong or
+anything gets leaked then it will be
+very bad for the company. So I wanted to
+keep all the answers relevant to the
+knowledge base and so I believe that the
+knowledge base should have all uh or not
+enough information rather to answer all
+uh current and new questions regarding
+uh the security systems. And so again
+these security systems can't differ from
+one for uh to another. And so you don't
+really want generalized answers
+depending on what they're asking. you
+really want specific answers tailored
+towards you maybe your company as well.
+And so as you can see for something
+maybe with an actual response you can
+see that three judges give higher scores
+as there is relevant context. Uh for
+something like completeness
+you could uh it does see the keywords in
+the KB entries and so it is then able to
+use those uh answers to those questions
+in this answer. And just same with
+accuracy, there's relevant uh entries
+there that are kind of like similar to
+this question. And then the risk as
+well. The risk is just making sure that
+it's not very unre not very unrealistic.
+It's kind of more on the conservative
+sides. Something like 100% hacking uh uh
+100% uh chance to not get hacked.
+Something like that is kind of
+unrealistic. And so if that happens, the
+risk will be much lower.
+And so these three judges um I saw in
+the bonus section and this is just my
+implementation on them. Again, if you
+really want to, you could delete the
+answer if you would like. And then you
+can delete all as well.
+And so this there's this quality score
+as well. And this is just a combination
+of the three judges with um accuracy
+being uh 0.5, completeness being 0.3,
+and risks being 0.2. And so this
+weighted answer will still be 90 as
+they're all 90 just for this example.
+And if you really want, you can still
+filter by category, which will then
+filter the ones
+um relevant.
+um the category since there was no
+category given um there were just
+classified um when uploading the
+question
+um based on what they are most relevant
+towards and like maybe the keywords in
+each question and so that's how they are
+categorized if they're not really
+related to anything in the KV then they
+would just be left uncatategorized
+moving on to analytics so
+um I do have a graph showing performance
+over
+Now since this uh knowledge base is
+quite small
+um the uh answers to the questions are I
+guess less accurate and some questions
+aren't even answered as you saw
+previously due to the lack of I guess KB
+entries
+and so preferably you would want it to
+be high 90s to 100 range but that is
+with more knowledge based entries. I
+just did this to reduce the number of
+hallucinations, but I it could be higher
+if you get the AI or LLM to generate
+maybe generalized answers.
+On the right side, you have the verdict
+distribution with the number of passes,
+the number of warnings, and the number
+of fails. Again, this is just to see of
+just user when answering the questions.
+If there's relevant context, then it
+will most likely be a pass. Otherwise,
+if there's no relevant context, it would
+be a warning or a fail depending on how
+severe it is. And so, for example,
+something like the accuracy due to the
+lack of um entries in the knowledge
+base. Uh only some questions could be
+answered with accuracy and then a lot of
+them were failing as well. And so this
+is just a dashboard to kind of visualize
+how the A or the LM is classifying um or
+answering these questions and what are
+the results with the judges as well.
+And so overall you just to recap you
+have the knowledge base you can upload a
+JSON to get uh in a specific format with
+the question the category the ID and the
+answer.
+And then you can add or delete entries
+and you can check the history. You can
+edit them with questions. These are
+questions you want answered uh with the
+LLM. And so you have the question and
+that question ID. And then I classified
+them into a category depending on some
+keywords in the sentences.
+And then you can edit and delete them
+again
+after you classify them depending on the
+number of relevant answers or if there
+is any at all. Um due to my uh trying
+due to my
+uh
+reduction on hallucination for the LM I
+wanted it to only answer based on
+information from the knowledge base and
+so this is why um some of them don't
+have information available.
+So it would not take any information
+from the web to answer these questions
+as I think it should be specific and
+tailored towards specific companies. And
+then when it does answer, you do have
+the judges with their accuracy,
+completeness, and risk. And if there's
+no um answer, then it will have scores
+of zero and ind indicate that there's a
+relevant context as needed to answer.
+And yeah, that's my project.
