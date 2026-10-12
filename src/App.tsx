@@ -16,7 +16,8 @@ function SideNav() {
   return (
     <aside className="sidenav">
       <Link to="/" className="brand">
-        Sentri
+        <img src="/owl.svg" alt="" className="brand-mark" />
+        Aegis
       </Link>
       <nav className="sidenav-links">
         {navItems.map((item) => (

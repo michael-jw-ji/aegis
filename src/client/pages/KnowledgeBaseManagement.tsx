@@ -120,7 +120,7 @@ const KnowledgeBaseManagement = () => {
         )}
       </main>
       <footer className="bg-purple-600 text-white w-full py-4 mt-auto">
-        <p className="text-center">&copy; 2025 Sentri AI</p>
+        <p className="text-center">&copy; 2025 Aegis</p>
       </footer>
     </div>
   );

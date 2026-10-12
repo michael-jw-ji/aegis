@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // SQLite database path
-const DB_PATH = path.join(__dirname, '../../..', 'data', 'sentri.db');
+const DB_PATH = path.join(__dirname, '../../..', 'data', 'aegis.db');
 
 // Database instance
 let db: sqlite3.Database | null = null;

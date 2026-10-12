@@ -1,4 +1,4 @@
-# Sentri AI - AI Engineering Take Home Assessment
+# Aegis - AI Engineering Take Home Assessment
 
 A questionnaire answering system that uses LangGraph/LangChain to intelligently answer security questionnaires against a knowledge base.
 
@@ -60,7 +60,7 @@ START → Retrieval Node (TF-IDF) → Generation Node (LangChain + Ollama) → E
 
 ## Database
 
-SQLite database (`data/sentri.db`) with tables:
+SQLite database (`data/aegis.db`) with tables:
 
 - `knowledge_base` + `knowledge_base_versions` (version control)
 - `security_questions`
@@ -120,4 +120,4 @@ This project was built using **Cursor with Claude** (AI-assisted development) th
 
 ## License
 
-Take-home assessment for Sentri AI.
+Take-home assessment for Aegis.

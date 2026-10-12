@@ -27,7 +27,7 @@ app.use('/api/judges', judgesRoutes);
 
 // Health check
 app.get('/', (_req, res) => {
-  res.json({ message: 'Sentri AI Questionnaire System API', status: 'running' });
+  res.json({ message: 'Aegis Questionnaire System API', status: 'running' });
 });
 
 export interface SecurityQuestion {
