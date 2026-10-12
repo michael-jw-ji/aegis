@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { SecurityQuestion } from "../../types";
+import SidebarSlot from "../components/SidebarSlot";
 
 const API_BASE = "/api/questions";
 
@@ -185,7 +186,7 @@ export default function Questions() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <div className="spinner"></div>
           <p className="text-gray-400">Loading questions...</p>
         </div>
       </div>
@@ -193,17 +194,52 @@ export default function Questions() {
   }
 
   return (
-    <div
-      className="flex gap-6 px-6 pt-8 overflow-hidden"
-      style={{
-        paddingBottom: "24px",
-        height: "100%",
-        marginBottom: "0",
-      }}
-    >
+    <div className="page">
+      <div className="toolbar">
+        <h1 className="text-3xl font-bold text-black">Questions</h1>
+        <div className="toolbar-tools">
+          <input
+            type="text"
+            placeholder="Search by ID, question..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="btn-modern-search px-4 text-black placeholder-gray-500 focus:outline-none text-sm"
+            style={{
+              height: "44px",
+              width: "280px",
+            }}
+          />
+          <div className="actions">
+            <label className="btn-modern btn-modern-black cursor-pointer flex items-center justify-center">
+              Upload JSON
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </label>
+            {questions.length > 0 && (
+              <button
+                onClick={handleGenerateAll}
+                disabled={generating}
+                className="btn-modern btn-modern-black cursor-pointer flex items-center justify-center"
+                style={{
+                  opacity: generating ? 0.5 : 1,
+                  cursor: generating ? "not-allowed" : "pointer",
+                }}
+              >
+                {generating ? "Generating..." : "Generate answers"}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="page-body">
+      <SidebarSlot>
       {/* Left Sidebar - Category Filter and Statistics */}
       <div
-        className="flex-shrink-0 flex flex-col gap-4"
+        className="rail flex-shrink-0 flex flex-col gap-4"
         style={{
           backgroundColor: "#E5E5E5",
           padding: "16px",
@@ -225,7 +261,7 @@ export default function Questions() {
           }}
         >
           <div className="text-xs font-semibold text-black mb-3 uppercase tracking-wide font-mono">
-            📁 Filter by Category
+            Filter by category
           </div>
           <select
             value={selectedCategory}
@@ -259,7 +295,7 @@ export default function Questions() {
           }}
         >
           <div className="text-xs font-semibold text-black mb-3 uppercase tracking-wide font-mono">
-            📊 Statistics
+            Overview
           </div>
           <div className="space-y-2 text-sm font-mono">
             <div className="flex justify-between text-black">
@@ -281,7 +317,7 @@ export default function Questions() {
         {questions.length > 0 && (
           <button
             onClick={handleDeleteAll}
-            className="btn-modern btn-modern-black w-full"
+            className="btn-modern btn-danger w-full"
             style={{
               padding: "16px",
               backgroundColor: "#000000",
@@ -292,10 +328,11 @@ export default function Questions() {
               marginBottom: "24px",
             }}
           >
-            🗑️ Delete All Questions
+            Delete all questions
           </button>
         )}
       </div>
+      </SidebarSlot>
 
       {/* Main Content Area */}
       <div
@@ -306,71 +343,9 @@ export default function Questions() {
           paddingBottom: "24px",
         }}
       >
-        {/* Header with Action Buttons */}
-        <div className="flex items-center justify-between mb-6">
-          <div style={{ marginTop: "12px", marginLeft: "24px" }}>
-            <h1 className="text-3xl font-bold text-black mb-1">Questions</h1>
-          </div>
-          <div className="flex items-center" style={{ paddingRight: "24px" }}>
-            {/* Search Bar */}
-            <input
-              type="text"
-              placeholder="🔍 Search by ID, question..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="btn-modern-search min-w-[300px] px-4 text-black placeholder-gray-500 focus:outline-none text-sm"
-              style={{
-                height: "48px",
-                border: "1px solid #000000",
-                marginRight: "32px",
-              }}
-            />
-            <div className="flex items-center" style={{ gap: "24px" }}>
-              <label
-                className="btn-modern btn-modern-black cursor-pointer flex items-center justify-center"
-                style={{
-                  width: "180px",
-                  height: "48px",
-                  padding: "0",
-                  backgroundColor: "#000000",
-                  color: "#FFFFFF",
-                  fontSize: "0.875rem",
-                }}
-              >
-                Upload JSON
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
-              {questions.length > 0 && (
-                <button
-                  onClick={handleGenerateAll}
-                  disabled={generating}
-                  className="btn-modern btn-modern-black cursor-pointer flex items-center justify-center"
-                  style={{
-                    width: "180px",
-                    height: "48px",
-                    padding: "0",
-                    backgroundColor: "#000000",
-                    color: "#FFFFFF",
-                    fontSize: "0.875rem",
-                    marginLeft: "24px",
-                    opacity: generating ? 0.5 : 1,
-                    cursor: generating ? "not-allowed" : "pointer",
-                  }}
-                >
-                  {generating ? "⏳ Generating..." : "Generate Answers"}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Grid - 2 columns with spacing */}
         <div
+          className="card-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, 1fr)",
@@ -394,7 +369,7 @@ export default function Questions() {
             return (
               <div
                 key={question.id}
-                className="transition-all cursor-pointer group"
+                className="entry-card"
                 style={{
                   backgroundColor: "#E5E5E5",
                   border: "none",
@@ -420,9 +395,7 @@ export default function Questions() {
 
                 {/* Category */}
                 {question.category && (
-                  <div className="text-base text-black mb-2">
-                    {question.category}
-                  </div>
+                  <div className="pill mb-2">{question.category}</div>
                 )}
 
                 {/* Footer: Date Created */}
@@ -447,16 +420,16 @@ export default function Questions() {
                     }}
                     className="btn-modern btn-modern-purple btn-modern-small flex-1"
                   >
-                    ✏️ Edit
+                    Edit
                   </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(question.id);
                     }}
-                    className="btn-modern btn-modern-black btn-modern-small flex-1"
+                    className="btn-modern btn-danger btn-modern-small flex-1"
                   >
-                    🗑️ Delete
+                    Delete
                   </button>
                 </div>
               </div>
@@ -466,7 +439,6 @@ export default function Questions() {
 
         {filteredQuestions.length === 0 && (
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">❓</div>
             <p className="text-xl text-gray-600 mb-2">No questions found</p>
             <p className="text-gray-500">
               {searchQuery || selectedCategory
@@ -476,11 +448,12 @@ export default function Questions() {
           </div>
         )}
       </div>
+      </div>
 
       {/* Edit Form Modal */}
       {showForm && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
           onClick={() => {
             setShowForm(false);
             setEditingId(null);
@@ -493,6 +466,7 @@ export default function Questions() {
           }}
         >
           <div
+            className="sheet"
             onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: "#FFFFFF",

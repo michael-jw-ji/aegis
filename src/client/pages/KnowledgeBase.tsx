@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { KBEntry, KBVersion } from "../../types";
+import SidebarSlot from "../components/SidebarSlot";
 
 const API_BASE = "/api/knowledge-base";
 
@@ -249,7 +250,7 @@ export default function KnowledgeBase() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <div className="spinner"></div>
           <p className="text-gray-400">Loading knowledge base...</p>
         </div>
       </div>
@@ -257,17 +258,54 @@ export default function KnowledgeBase() {
   }
 
   return (
-    <div
-      className="flex gap-6 px-6 pt-8 overflow-hidden"
-      style={{
-        paddingBottom: "0",
-        height: "100%",
-        marginBottom: "0",
-      }}
-    >
+    <div className="page">
+      <div className="toolbar">
+        <h1 className="text-3xl font-bold text-black">Knowledge Base</h1>
+        <div className="toolbar-tools">
+          <input
+            type="text"
+            placeholder="Search by ID, question, answer..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="btn-modern-search px-4 text-black placeholder-gray-500 focus:outline-none text-sm"
+            style={{
+              height: "44px",
+              width: "280px",
+            }}
+          />
+          <div className="actions">
+            <label className="btn-modern btn-modern-black cursor-pointer flex items-center justify-center">
+              Upload JSON
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </label>
+            <button
+              onClick={() => {
+                setShowForm(true);
+                setEditingId(null);
+                setFormData({
+                  id: "",
+                  category: "",
+                  question: "",
+                  answer: "",
+                });
+              }}
+              className="btn-modern btn-modern-black cursor-pointer flex items-center justify-center"
+            >
+              Add Entry
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="page-body">
+      <SidebarSlot>
       {/* Left Sidebar - Category Filter and Statistics */}
       <div
-        className="flex-shrink-0 flex flex-col gap-4"
+        className="rail flex-shrink-0 flex flex-col gap-4"
         style={{
           backgroundColor: "#E5E5E5",
           padding: "16px",
@@ -288,7 +326,7 @@ export default function KnowledgeBase() {
           }}
         >
           <div className="text-xs font-semibold text-black mb-3 uppercase tracking-wide font-mono">
-            📁 Filter by Category
+            Filter by category
           </div>
           <select
             value={selectedCategory}
@@ -322,7 +360,7 @@ export default function KnowledgeBase() {
           }}
         >
           <div className="text-xs font-semibold text-black mb-3 uppercase tracking-wide font-mono">
-            📊 Statistics
+            Overview
           </div>
           <div className="space-y-2 text-sm font-mono">
             <div className="flex justify-between text-black">
@@ -344,7 +382,7 @@ export default function KnowledgeBase() {
         {entries.length > 0 && (
           <button
             onClick={handleDeleteAll}
-            className="btn-modern btn-modern-black w-full"
+            className="btn-modern btn-danger w-full"
             style={{
               padding: "16px",
               backgroundColor: "#000000",
@@ -355,10 +393,11 @@ export default function KnowledgeBase() {
               marginBottom: "24px",
             }}
           >
-            🗑️ Delete All Entries
+            Delete all entries
           </button>
         )}
       </div>
+      </SidebarSlot>
 
       {/* Main Content Area */}
       <div
@@ -369,77 +408,9 @@ export default function KnowledgeBase() {
           paddingBottom: "0",
         }}
       >
-        {/* Header with Action Buttons */}
-        <div className="flex items-center justify-between mb-6">
-          <div style={{ marginTop: "12px", marginLeft: "24px" }}>
-            <h1 className="text-3xl font-bold text-black mb-1">
-              Knowledge Base
-            </h1>
-          </div>
-          <div className="flex items-center" style={{ paddingRight: "24px" }}>
-            {/* Search Bar */}
-            <input
-              type="text"
-              placeholder="🔍 Search by ID, question, answer..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="btn-modern-search min-w-[300px] px-4 text-black placeholder-gray-500 focus:outline-none text-sm"
-              style={{
-                height: "48px",
-                border: "1px solid #000000",
-                marginRight: "32px",
-              }}
-            />
-            <div className="flex items-center" style={{ gap: "24px" }}>
-              <label
-                className="btn-modern btn-modern-black cursor-pointer flex items-center justify-center"
-                style={{
-                  width: "180px",
-                  height: "48px",
-                  padding: "0",
-                  backgroundColor: "#000000",
-                  color: "#FFFFFF",
-                  fontSize: "0.875rem",
-                }}
-              >
-                Upload JSON
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
-              <button
-                onClick={() => {
-                  setShowForm(true);
-                  setEditingId(null);
-                  setFormData({
-                    id: "",
-                    category: "",
-                    question: "",
-                    answer: "",
-                  });
-                }}
-                className="btn-modern btn-modern-black cursor-pointer flex items-center justify-center"
-                style={{
-                  width: "180px",
-                  height: "48px",
-                  padding: "0",
-                  backgroundColor: "#000000",
-                  color: "#FFFFFF",
-                  fontSize: "0.875rem",
-                  marginLeft: "24px",
-                }}
-              >
-                Add Entry
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* Grid - 2 columns with spacing */}
         <div
+          className="card-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, 1fr)",
@@ -463,7 +434,7 @@ export default function KnowledgeBase() {
             return (
               <div
                 key={entry.id}
-                className="transition-all cursor-pointer group"
+                className="entry-card"
                 style={{
                   backgroundColor: "#E5E5E5",
                   border: "none",
@@ -489,9 +460,7 @@ export default function KnowledgeBase() {
                 </h3>
 
                 {/* Category */}
-                <div className="text-base text-black mb-4">
-                  {entry.category}
-                </div>
+                <div className="pill mb-4">{entry.category}</div>
 
                 {/* Answer */}
                 <p className="text-base text-black leading-relaxed mb-6 flex-grow">
@@ -530,7 +499,7 @@ export default function KnowledgeBase() {
                       margin: "0",
                     }}
                   >
-                    ✏️ Edit
+                    Edit
                   </button>
                   <button
                     onClick={(e) => {
@@ -545,14 +514,14 @@ export default function KnowledgeBase() {
                       margin: "0",
                     }}
                   >
-                    📜 History
+                    History
                   </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(entry.id);
                     }}
-                    className="btn-modern btn-modern-black btn-modern-small"
+                    className="btn-modern btn-danger btn-modern-small"
                     style={{
                       flex: "0 0 auto",
                       padding: "8px 16px",
@@ -560,7 +529,7 @@ export default function KnowledgeBase() {
                       margin: "0",
                     }}
                   >
-                    🗑️ Delete
+                    Delete
                   </button>
                 </div>
               </div>
@@ -570,7 +539,6 @@ export default function KnowledgeBase() {
 
         {filteredEntries.length === 0 && (
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">📚</div>
             <p className="text-xl text-gray-600 mb-2">No entries found</p>
             <p className="text-gray-500">
               {searchQuery || selectedCategory
@@ -580,11 +548,12 @@ export default function KnowledgeBase() {
           </div>
         )}
       </div>
+      </div>
 
       {/* Form Modal */}
       {showForm && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{
             position: "fixed",
             top: 0,
@@ -603,7 +572,7 @@ export default function KnowledgeBase() {
           }}
         >
           <div
-            className="relative"
+            className="sheet relative"
             onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: "#FFFFFF",
@@ -766,13 +735,11 @@ export default function KnowledgeBase() {
                       answer: "",
                     });
                   }}
-                  className="btn-modern btn-modern-black flex-1"
+                  className="btn-modern flex-1"
                   style={{
                     width: "100%",
                     height: "48px",
                     padding: "0",
-                    backgroundColor: "#000000",
-                    color: "#FFFFFF",
                     fontSize: "0.875rem",
                   }}
                 >
@@ -787,7 +754,7 @@ export default function KnowledgeBase() {
       {/* Version History Modal */}
       {showVersionHistory && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{
             position: "fixed",
             top: 0,
@@ -806,7 +773,7 @@ export default function KnowledgeBase() {
           }}
         >
           <div
-            className="relative"
+            className="sheet relative"
             onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: "#FFFFFF",
@@ -838,7 +805,7 @@ export default function KnowledgeBase() {
             </button>
             <div className="mb-6">
               <h2 className="text-2xl font-bold" style={{ color: "#000000" }}>
-                📜 Version History
+                Version history
               </h2>
             </div>
 
@@ -910,7 +877,7 @@ export default function KnowledgeBase() {
                           className="mt-3 btn-modern btn-modern-purple btn-modern-small"
                           style={{ width: "100%" }}
                         >
-                          🔄 Restore This Version
+                          Restore this version
                         </button>
                       )}
                     </div>

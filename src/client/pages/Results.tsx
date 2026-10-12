@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { GeneratedAnswer, JudgeEvaluation } from "../../types";
+import SidebarSlot from "../components/SidebarSlot";
 
 const API_BASE = "/api/answers";
 
@@ -120,73 +121,24 @@ export default function Results() {
 
   // Helper function to get color based on score and verdict
   const getVerdictColor = (
-    score: number | null | undefined,
+    _score: number | null | undefined,
     verdict: string | null | undefined
   ) => {
-    const scoreValue = score ?? 0;
     const verdictUpper = (verdict || "").toUpperCase();
-
-    // If verdict is explicitly FAIL, use red
     if (verdictUpper === "FAIL") {
-      // Darker red for lower scores (0 = darkest)
-      const intensity = Math.max(0, Math.min(1, scoreValue / 50)); // 0-50 maps to 0-1
-      const red = Math.round(139 + 116 * (1 - intensity)); // 139 (dark red) to 255 (lighter red)
-      const green = Math.round(0 + 69 * (1 - intensity)); // 0 to 69
-      const blue = Math.round(0 + 19 * (1 - intensity)); // 0 to 19
-      return {
-        backgroundColor: `rgb(${red}, ${green}, ${blue})`,
-        color: "#ffffff",
-      };
+      return { backgroundColor: "rgba(255, 77, 77, 0.16)", color: "#ff8d86" };
     }
-
-    // If verdict is WARNING, use orange/yellow
     if (verdictUpper === "WARNING") {
-      // Orange to yellow based on score
-      const intensity = Math.max(0, Math.min(1, scoreValue / 70)); // 0-70 maps to 0-1
-      const red = 255;
-      const green = Math.round(140 + 115 * intensity); // 140 (orange) to 255 (yellow)
-      const blue = 0;
-      return {
-        backgroundColor: `rgb(${red}, ${green}, ${blue})`,
-        color: "#000000",
-      };
+      return { backgroundColor: "rgba(255, 176, 32, 0.16)", color: "#ffb020" };
     }
-
-    // If verdict is PASS or anything else, use green (darker = better)
-    // Score 0-40: Light green to medium green
-    // Score 41-70: Medium green
-    // Score 71-100: Medium green to dark green (darker = better)
-    let red, green, blue;
-    if (scoreValue <= 40) {
-      // Light green to medium green (worse scores = lighter)
-      const intensity = scoreValue / 40;
-      red = Math.round(144 + 111 * intensity); // 144 to 255
-      green = Math.round(238 + 17 * intensity); // 238 to 255
-      blue = Math.round(144 + 111 * intensity); // 144 to 255
-    } else if (scoreValue <= 70) {
-      // Medium green (consistent)
-      red = 34;
-      green = 197;
-      blue = 94;
-    } else {
-      // Medium green to dark green (better scores = darker)
-      const intensity = (scoreValue - 70) / 30; // 0-1 for scores 70-100
-      red = Math.round(34 - 34 * intensity); // 34 to 0 (darker)
-      green = Math.round(197 - 97 * intensity); // 197 to 100 (darker)
-      blue = Math.round(94 - 94 * intensity); // 94 to 0 (darker)
-    }
-
-    return {
-      backgroundColor: `rgb(${red}, ${green}, ${blue})`,
-      color: scoreValue >= 70 ? "#ffffff" : "#000000", // White text for darker greens
-    };
+    return { backgroundColor: "rgba(61, 214, 140, 0.16)", color: "#3dd68c" };
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <div className="spinner"></div>
           <p className="text-gray-400">Loading results...</p>
         </div>
       </div>
@@ -194,17 +146,28 @@ export default function Results() {
   }
 
   return (
-    <div
-      className="flex gap-6 px-6 pt-8 overflow-hidden"
-      style={{
-        paddingBottom: "24px",
-        height: "100%",
-        marginBottom: "0",
-      }}
-    >
+    <div className="page">
+      <div className="toolbar">
+        <h1 className="text-3xl font-bold text-black">Results</h1>
+        <div className="toolbar-tools">
+          <input
+            type="text"
+            placeholder="Search by question, answer..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="btn-modern-search px-4 text-black placeholder-gray-500 focus:outline-none text-sm"
+            style={{
+              height: "44px",
+              width: "280px",
+            }}
+          />
+        </div>
+      </div>
+      <div className="page-body">
+      <SidebarSlot>
       {/* Left Sidebar - Category Filter and Statistics */}
       <div
-        className="flex-shrink-0 flex flex-col gap-4"
+        className="rail flex-shrink-0 flex flex-col gap-4"
         style={{
           backgroundColor: "#E5E5E5",
           padding: "16px",
@@ -228,7 +191,7 @@ export default function Results() {
           }}
         >
           <div className="text-xs font-semibold text-black mb-3 uppercase tracking-wide font-mono">
-            📁 Filter by Category (Multi-select)
+            Filter by category
           </div>
           <div className="space-y-2 mt-2">
             {allCategories.map((cat) => (
@@ -276,7 +239,7 @@ export default function Results() {
           }}
         >
           <div className="text-xs font-semibold text-black mb-3 uppercase tracking-wide font-mono">
-            📊 Statistics
+            Overview
           </div>
           <div className="space-y-2 text-sm font-mono">
             <div className="flex justify-between text-black">
@@ -304,7 +267,7 @@ export default function Results() {
         {answers.length > 0 && (
           <button
             onClick={handleDeleteAll}
-            className="btn-modern btn-modern-black w-full"
+            className="btn-modern btn-danger w-full"
             style={{
               padding: "16px",
               backgroundColor: "#000000",
@@ -315,10 +278,11 @@ export default function Results() {
               marginBottom: "24px",
             }}
           >
-            🗑️ Delete All Answers
+            Delete all answers
           </button>
         )}
       </div>
+      </SidebarSlot>
 
       {/* Main Content Area */}
       <div
@@ -329,30 +293,9 @@ export default function Results() {
           paddingBottom: "24px",
         }}
       >
-        {/* Header with Action Buttons */}
-        <div className="flex items-center justify-between mb-6">
-          <div style={{ marginTop: "12px", marginLeft: "24px" }}>
-            <h1 className="text-3xl font-bold text-black mb-1">Results</h1>
-          </div>
-          <div className="flex items-center" style={{ paddingRight: "24px" }}>
-            {/* Search Bar */}
-            <input
-              type="text"
-              placeholder="🔍 Search by question, answer..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="btn-modern-search min-w-[300px] px-4 text-black placeholder-gray-500 focus:outline-none text-sm"
-              style={{
-                height: "48px",
-                border: "1px solid #000000",
-                marginRight: "32px",
-              }}
-            />
-          </div>
-        </div>
-
         {/* Grid - 2 columns with spacing */}
         <div
+          className="card-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, 1fr)",
@@ -376,7 +319,7 @@ export default function Results() {
             return (
               <div
                 key={answer.id}
-                className="transition-all cursor-pointer group"
+                className="entry-card"
                 style={{
                   backgroundColor: "#E5E5E5",
                   border: "none",
@@ -397,7 +340,7 @@ export default function Results() {
                 </h3>
 
                 {/* Category */}
-                <div className="text-base text-black mb-4">
+                <div className="pill mb-4">
                   {answer.category || "Uncategorized"}
                 </div>
 
@@ -427,9 +370,9 @@ export default function Results() {
                       e.stopPropagation();
                       handleDelete(answer.id);
                     }}
-                    className="btn-modern btn-modern-black btn-modern-small w-full"
+                    className="btn-modern btn-danger btn-modern-small w-full"
                   >
-                    🗑️ Delete
+                    Delete
                   </button>
                   <button
                     onClick={(e) => {
@@ -438,7 +381,7 @@ export default function Results() {
                     }}
                     className="btn-modern btn-modern-small w-full"
                   >
-                    🧑‍⚖️ Judges
+                    Judges
                   </button>
                 </div>
 
@@ -453,7 +396,7 @@ export default function Results() {
                           paddingBottom: "16px",
                           paddingLeft: "16px",
                           paddingRight: "16px",
-                          backgroundColor: "#D0D0D0",
+                          backgroundColor: "#1c1c21",
                         }}
                       >
                         No evaluations yet.
@@ -477,7 +420,7 @@ export default function Results() {
                                 paddingLeft: "16px",
                                 paddingRight: "16px",
                                 marginBottom: isLast ? "0px" : "24px",
-                                backgroundColor: "#D0D0D0",
+                                backgroundColor: "#1c1c21",
                               }}
                             >
                               <div className="flex justify-between items-center mb-2">
@@ -520,7 +463,6 @@ export default function Results() {
 
         {filteredAnswers.length === 0 && (
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">✨</div>
             <p className="text-xl text-gray-600 mb-2">No answers found</p>
             <p className="text-gray-500">
               {searchQuery || selectedCategories.length > 0
@@ -529,6 +471,7 @@ export default function Results() {
             </p>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

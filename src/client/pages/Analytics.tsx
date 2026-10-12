@@ -76,32 +76,15 @@ export default function Analytics() {
           <span className="text-sm font-mono font-semibold">{label}</span>
           <span className="text-sm font-mono font-bold">{value}</span>
         </div>
-        <div
-          style={{
-            width: "100%",
-            height: "32px",
-            backgroundColor: "#E5E5E5",
-            position: "relative",
-            overflow: "hidden",
-            borderRadius: "4px",
-          }}
-        >
-          <div
+        <div className="meter">
+          <span
             style={{
-              width: animated ? `${percentage}%` : "0%",
-              height: "100%",
+              transform: animated
+                ? `scaleX(${Math.max(0, Math.min(100, percentage)) / 100})`
+                : "scaleX(0)",
               backgroundColor: color,
-              transition: "width 1.5s ease-out",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: percentage > 50 ? "#FFFFFF" : "#000000",
-              fontWeight: "600",
-              fontSize: "0.875rem",
             }}
-          >
-            {animated && `${percentage.toFixed(1)}%`}
-          </div>
+          />
         </div>
       </div>
     );
@@ -147,31 +130,15 @@ export default function Analytics() {
                   {item.value}
                 </span>
               </div>
-              <div
-                style={{
-                  width: "100%",
-                  height: "28px",
-                  backgroundColor: "#E5E5E5",
-                  position: "relative",
-                  overflow: "hidden",
-                  borderRadius: "4px",
-                }}
-              >
-                <div
+              <div className="meter">
+                <span
                   style={{
-                    width: animated
-                      ? `${Math.min(100, (item.value / maxValue) * 100)}%`
-                      : "0%",
-                    height: "100%",
+                    transform: animated
+                      ? `scaleX(${Math.min(1, item.value / maxValue)})`
+                      : "scaleX(0)",
+                    transformOrigin: "left center",
                     backgroundColor: item.color,
-                    transition: `width 1.5s ease-out ${index * 0.1}s`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    paddingRight: "8px",
-                    color: "#000000",
-                    fontWeight: "600",
-                    fontSize: "0.75rem",
+                    transitionDelay: `${index * 0.08}s`,
                   }}
                 />
               </div>
@@ -333,9 +300,15 @@ export default function Analytics() {
           }}
         >
           <svg
-            width={chartWidth}
-            height={chartHeight}
-            style={{ overflow: "visible" }}
+            width="100%"
+            viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+            style={{
+              overflow: "visible",
+              flex: "1 1 auto",
+              minWidth: 0,
+              maxWidth: chartWidth,
+              height: "auto",
+            }}
           >
             {/* Grid lines */}
             {[0, 25, 50, 75, 100].map((value) => {
@@ -347,7 +320,7 @@ export default function Analytics() {
                     y1={y}
                     x2={chartWidth - padding.right}
                     y2={y}
-                    stroke="#E5E5E5"
+                    stroke="#2a2a2e"
                     strokeWidth="1"
                   />
                   <text
@@ -355,8 +328,8 @@ export default function Analytics() {
                     y={y + 4}
                     textAnchor="end"
                     fontSize="10"
-                    fill="#666"
-                    fontFamily="monospace"
+                    fill="#9a9aa2"
+                    fontFamily="Inter, sans-serif"
                   >
                     {value}%
                   </text>
@@ -378,8 +351,8 @@ export default function Analytics() {
                   y={chartHeight - padding.bottom + 20}
                   textAnchor="middle"
                   fontSize="10"
-                  fill="#666"
-                  fontFamily="monospace"
+                  fill="#9a9aa2"
+                  fontFamily="Inter, sans-serif"
                 >
                   {formatDate(d.date)}
                 </text>
@@ -390,7 +363,7 @@ export default function Analytics() {
             <path
               d={passRatePath}
               fill="none"
-              stroke="#22C55E"
+              stroke="#3dd68c"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -406,7 +379,7 @@ export default function Analytics() {
                 cx={scaleX(i)}
                 cy={scaleY(d.passRate)}
                 r="4"
-                fill="#22C55E"
+                fill="#3dd68c"
                 style={{
                   opacity: animated ? 1 : 0,
                   transition: `opacity 0.5s ease ${i * 0.1}s`,
@@ -418,7 +391,7 @@ export default function Analytics() {
             <path
               d={avgScorePath}
               fill="none"
-              stroke="#3B82F6"
+              stroke="#f2f2f2"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -434,7 +407,7 @@ export default function Analytics() {
                 cx={scaleX(i)}
                 cy={scaleY(d.avgScore)}
                 r="4"
-                fill="#3B82F6"
+                fill="#f2f2f2"
                 style={{
                   opacity: animated ? 1 : 0,
                   transition: `opacity 0.5s ease ${0.2 + i * 0.1}s`,
@@ -448,8 +421,8 @@ export default function Analytics() {
               y1={padding.top}
               x2={padding.left}
               y2={chartHeight - padding.bottom}
-              stroke="#000"
-              strokeWidth="2"
+              stroke="#3a3a40"
+              strokeWidth="1"
             />
             {/* X-axis */}
             <line
@@ -457,8 +430,8 @@ export default function Analytics() {
               y1={chartHeight - padding.bottom}
               x2={chartWidth - padding.right}
               y2={chartHeight - padding.bottom}
-              stroke="#000"
-              strokeWidth="2"
+              stroke="#3a3a40"
+              strokeWidth="1"
             />
           </svg>
         </div>
@@ -476,7 +449,7 @@ export default function Analytics() {
               style={{
                 width: "16px",
                 height: "3px",
-                backgroundColor: "#22C55E",
+                backgroundColor: "#3dd68c",
               }}
             />
             <span className="text-xs font-mono">Pass Rate</span>
@@ -486,7 +459,7 @@ export default function Analytics() {
               style={{
                 width: "16px",
                 height: "3px",
-                backgroundColor: "#3B82F6",
+                backgroundColor: "#f2f2f2",
               }}
             />
             <span className="text-xs font-mono">Average Score</span>
@@ -551,7 +524,7 @@ export default function Analytics() {
               cy="100"
               r="80"
               fill="none"
-              stroke="#E5E5E5"
+              stroke="#2a2a2e"
               strokeWidth="40"
             />
             {segments.map((segment, index) => {
@@ -610,7 +583,7 @@ export default function Analytics() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <div className="spinner"></div>
           <p className="text-gray-400">Loading analytics...</p>
         </div>
       </div>
@@ -629,7 +602,6 @@ export default function Analytics() {
       >
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="text-6xl mb-4">📊</div>
             <p className="text-xl text-gray-600 mb-2">No analytics data yet</p>
             <p className="text-gray-500">
               Generate some answers first to see compliance metrics
@@ -641,39 +613,20 @@ export default function Analytics() {
   }
 
   return (
-    <div
-      className="flex gap-6 px-6 pt-8 overflow-hidden"
-      style={{
-        paddingBottom: "24px",
-        height: "100%",
-        marginBottom: "0",
-      }}
-    >
-      {/* Main Content Area */}
-      <div
-        className="flex-1 overflow-y-auto pr-4"
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-          paddingBottom: "24px",
-        }}
-      >
-        {/* Header */}
-        <div
-          style={{
-            marginTop: "12px",
-            marginLeft: "24px",
-            marginBottom: "32px",
-          }}
-        >
-          <h1 className="text-3xl font-bold text-black mb-1">Analytics</h1>
-          <p className="text-gray-600 text-sm">
-            Compliance metrics and pass rates
-          </p>
+    <div className="page">
+      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+        <div className="toolbar">
+          <div>
+            <h1 className="text-3xl font-bold text-black">Analytics</h1>
+            <p className="text-sm" style={{ color: "var(--muted)", marginTop: "4px" }}>
+              Compliance metrics and pass rates
+            </p>
+          </div>
         </div>
 
         {/* Overview Stats */}
         <div
+          className="stat-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
@@ -751,6 +704,7 @@ export default function Analytics() {
 
         {/* Charts Grid */}
         <div
+          className="card-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, 1fr)",
@@ -773,17 +727,17 @@ export default function Analytics() {
               {
                 name: "PASS",
                 value: data.verdictDistribution.pass,
-                color: "#22C55E",
+                color: "#3dd68c",
               },
               {
                 name: "WARNING",
                 value: data.verdictDistribution.warning,
-                color: "#F59E0B",
+                color: "#ffb020",
               },
               {
                 name: "FAIL",
                 value: data.verdictDistribution.fail,
-                color: "#EF4444",
+                color: "#ff4d4d",
               },
             ]}
           />
@@ -804,13 +758,13 @@ export default function Analytics() {
             </div>
             <AnimatedProgressBar
               percentage={data.overallPassRate}
-              color="#22C55E"
+              color="#3dd68c"
               label="Pass Rate"
               value={`${data.overallPassRate.toFixed(1)}%`}
             />
             <AnimatedProgressBar
               percentage={data.overallAvgScore}
-              color="#3B82F6"
+              color="#f2f2f2"
               label="Average Score"
               value={`${data.overallAvgScore.toFixed(1)}/100`}
             />
@@ -837,7 +791,7 @@ export default function Analytics() {
                     100
                   : 0
               }
-              color="#22C55E"
+              color="#3dd68c"
               label="PASS"
               value={`${data.verdictDistribution.pass} (${
                 data.totalEvaluations > 0
@@ -855,7 +809,7 @@ export default function Analytics() {
                     100
                   : 0
               }
-              color="#F59E0B"
+              color="#ffb020"
               label="WARNING"
               value={`${data.verdictDistribution.warning} (${
                 data.totalEvaluations > 0
@@ -874,7 +828,7 @@ export default function Analytics() {
                     100
                   : 0
               }
-              color="#EF4444"
+              color="#ff4d4d"
               label="FAIL"
               value={`${data.verdictDistribution.fail} (${
                 data.totalEvaluations > 0
@@ -924,17 +878,17 @@ export default function Analytics() {
                     {
                       name: "PASS",
                       value: judge.pass,
-                      color: "#22C55E",
+                      color: "#3dd68c",
                     },
                     {
                       name: "WARNING",
                       value: judge.warning,
-                      color: "#F59E0B",
+                      color: "#ffb020",
                     },
                     {
                       name: "FAIL",
                       value: judge.fail,
-                      color: "#EF4444",
+                      color: "#ff4d4d",
                     },
                   ]}
                 />
@@ -955,7 +909,7 @@ export default function Analytics() {
               fontSize: "0.875rem",
             }}
           >
-            🔄 Refresh Analytics
+            Refresh analytics
           </button>
         </div>
       </div>
